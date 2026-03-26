@@ -1,9 +1,9 @@
 <div align="center">
   <h1>claude-curated</h1>
-  <p><strong>10 original Claude Code skills built from real-world usage — security scanning, adversarial review, multi-model debate, dev-server sync, and more.</strong></p>
+  <p><strong>8 original Claude Code skills built from real-world usage — security scanning, adversarial review, multi-model debate, dev-server sync, and more.</strong></p>
 
   ![Claude Code](https://img.shields.io/badge/Claude_Code-skills-blueviolet)
-  ![Skills](https://img.shields.io/badge/skills-10-blue)
+  ![Skills](https://img.shields.io/badge/skills-8-blue)
   ![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey)
   ![License](https://img.shields.io/badge/license-Apache--2.0-red)
 </div>
@@ -17,9 +17,7 @@ Every skill was built from real production usage — not written as demos.
 | Category | Skill | What it does |
 |----------|-------|-------------|
 | Security | **Red Alert** | Adversarial red team — finds security holes, logic bugs |
-| Security | **Skill Guard** | Security scanner + health auditor (60 patterns, 14 categories) |
-| Maintenance | **Memory Keeper** | Memory lifecycle management |
-| Maintenance | **Claude MD Trim** | CLAUDE.md rule optimizer |
+| Maintenance | **MD Cleanup** | Unified context budget auditor — CLAUDE.md, hookify rules, memory files, skills |
 | Maintenance | **Skill Profile** | Skill profile switching (all/coding/outreach/minimal) |
 | Workflow | **Dependency Tracker** | Finds stale references after renames/moves |
 | Workflow | **Research Council** | 6 free LLMs debate, cross-examine, deliver consensus — $0/decision |
@@ -34,12 +32,10 @@ Each skill was extracted from a real problem:
 - **dependency-tracker** — Renamed a config file, broke 6 downstream references silently. Never again.
 - **tldr-eli5** — Needed different compression ratios for English vs Chinese summaries, plus simple explanations for non-technical stakeholders.
 - **skill-extractor** — Installed a community skill that overlapped 80% with existing tools. Built an evaluator to check before installing.
-- **claude-md-trim** — CLAUDE.md grew to 400+ lines, burning tokens on every message. Most rules Claude already knew.
 - **skill-profile** — Hit the 15K YAML limit with 30+ skills. Needed profile switching to load only relevant skills per task.
-- **memory-keeper** — Memory files went stale within weeks. Needed automated lifecycle: mine, prune, promote.
-- **skill-guard** — Installed a community skill that had obfuscated code. Built a scanner before it happened again.
 - **research-council** — LLMs are sycophantic. They agree with you. Built a council of 6 models that cross-examine each other — they disagree, change their minds, and produce answers none of them would give alone. Cost per decision: $0.
 - **single-source-of-truth** — Edited code on laptop, deployed to server, forgot to push. Server had stale code for 3 days. Built a git-only sync workflow that makes this impossible.
+- **md-cleanup** — Three separate maintenance skills (claude-md-trim, memory-keeper, skill-guard's skill-cleaning sub-feature) kept being invoked in the wrong order or piecemeal. Merged into one unified context budget auditor: one command, one report, five phases (CLAUDE.md → hookify rules → memory files → skills inventory → budget table).
 
 ## Who This Is For
 
@@ -62,7 +58,7 @@ Each skill was extracted from a real problem:
 ### Manual (one skill at a time)
 ```bash
 git clone https://github.com/nardovibecoding/claude-curated.git
-cp -r claude-curated/skills/security/red-alert ~/.claude/skills/
+cp -r claude-curated/skills/maintenance/md-cleanup ~/.claude/skills/
 ```
 
 ### Manual (all skills)
@@ -75,22 +71,17 @@ Each skill works independently — install only what you need. Skills activate a
 
 ## Highlights
 
-### Skill Guard — Security Scanner + Health Auditor
+### MD Cleanup — Unified Context Budget Auditor
 
-The most code-heavy skill in the collection. Includes three Python scripts and a full threat model reference:
+Replaces three separate maintenance skills (`claude-md-trim`, `memory-keeper`, `skill-guard`'s skill-cleaning sub-feature) with a single five-phase audit:
 
-- **`skill_security_auditor.py`** — static analysis scanner with 60+ detection patterns across 14 categories (command injection, code execution, obfuscation, network exfiltration, credential harvesting, filesystem abuse, privilege escalation, deserialization, prompt injection, supply chain, and more)
-- **`rescan_skills.py`** — checksum-based change detection that re-audits only modified or new skills
-- **`skill_rescan_watch.sh`** — fswatch daemon that auto-triggers rescans on file changes
+1. **CLAUDE.md Audit** — classifies each rule as INTERNALIZED / REINFORCED / CUSTOM / HISTORICAL / REDUNDANT, estimates token savings
+2. **Hookify Rules Audit** — deduplicates hookify rules against CLAUDE.md and feedback memory
+3. **Memory Audit** — checks line counts, staleness, duplicate topics, and promotion candidates
+4. **Skills Audit** — inventory, duplicate trigger detection, broken scripts, missing deps, upstream updates
+5. **Budget Report** — token table across all context sources with thresholds
 
-Produces a clear **PASS / WARN / FAIL** verdict with findings, severity levels, and remediation guidance. Supports `--strict` mode, JSON output, batch auditing, and CI/CD integration.
-
-```bash
-python3 skill-guard/scripts/skill_security_auditor.py /path/to/skill/
-python3 skill-guard/scripts/skill_security_auditor.py /path/to/skill/ --strict --json
-```
-
-Also includes **Skill Cleaning** — a health audit sub-skill that checks for duplicates, broken scripts, missing dependencies, unused skills, and upstream updates.
+One command. One report. Actionable recommendations on approval.
 
 ### Red Alert — Adversarial Self-Review
 
@@ -102,18 +93,6 @@ Standard code review is sycophantic. Red Alert uses a "paid-to-find-flaws" promp
 - **Scheduled red team** — full-system attack against an 8-point checklist (security, reliability, cost, data loss, stale state, dead code, dependencies, monitoring gaps)
 
 Supports multi-model review: use a different LLM as an external critic since different training data catches different blind spots.
-
-### Memory Keeper — Full Lifecycle Management
-
-Five jobs in one skill:
-
-1. **Extract** — mine expiring sessions for unsaved knowledge before they disappear
-2. **Detect stale** — verify memory claims against actual code, cron, processes, file paths
-3. **Clean up** — remove obsolete entries, consolidate overlapping topic files
-4. **Auto-promote** — score memory entries on durability/impact/scope, graduate proven patterns to enforced rules in CLAUDE.md
-5. **Skill extraction** — identify recurring multi-step solutions and extract them into standalone reusable skills
-
-Includes a capacity monitoring table to keep memory, rules, and topic files within healthy limits.
 
 ### Research Council — Multi-Model Debate
 
@@ -145,13 +124,9 @@ claude-curated/
 │   └── plugin.json              # Plugin manifest
 ├── skills/
 │   ├── security/
-│   │   ├── red-alert/           # Adversarial red team review
-│   │   └── skill-guard/         # Security scanner + health auditor
-│   │       ├── scripts/         # Python scanners + fswatch daemon
-│   │       └── references/      # Threat model
+│   │   └── red-alert/           # Adversarial red team review
 │   ├── maintenance/
-│   │   ├── memory-keeper/       # Memory lifecycle management
-│   │   ├── claude-md-trim/      # CLAUDE.md rule optimizer
+│   │   ├── md-cleanup/          # Unified context budget auditor (5-phase)
 │   │   └── skill-profile/       # Profile switching
 │   ├── workflow/
 │   │   ├── dependency-tracker/  # Stale reference finder
