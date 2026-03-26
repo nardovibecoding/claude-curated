@@ -24,7 +24,7 @@ Every skill was built from real production usage — not written as demos.
 | `skill-profile` | **Skill Profile** | Skill profile switching |
 | `memory-keeper` | **Memory Keeper** | Memory lifecycle management |
 | `skill-guard` | **Skill Guard** | Security scanner + health auditor (60 patterns, 14 categories) |
-| `rd-council` | **R&D Council** | 6-model debate with cross-examination and consensus memo |
+| `rd-council` | **R&D Council** | 6 free LLMs debate, cross-examine, and deliver a consensus memo — $0/decision |
 | `single-source` | **Single Source** | Dev machine to server sync via GitHub — no rsync, no scp |
 
 ## Where These Came From
@@ -38,7 +38,7 @@ Each skill was extracted from a real problem:
 - **skill-profile** — Hit the 15K YAML limit with 30+ skills. Needed profile switching to load only relevant skills per task.
 - **memory-keeper** — Memory files went stale within weeks. Needed automated lifecycle: mine, prune, promote.
 - **skill-guard** — Installed a community skill that had obfuscated code. Built a scanner before it happened again.
-- **rd-council** — Asking one model gives one perspective. Built a 6-model debate system where models cross-examine each other's arguments and produce a consensus memo.
+- **rd-council** — LLMs are sycophantic. They agree with you. Built a council of 6 models that cross-examine each other — they disagree, change their minds, and produce answers none of them would give alone. Cost per decision: $0.
 - **single-source** — Edited code on laptop, deployed to server, forgot to push. Server had stale code for 3 days. Built a git-only sync workflow that makes this impossible.
 
 ## Who This Is For
