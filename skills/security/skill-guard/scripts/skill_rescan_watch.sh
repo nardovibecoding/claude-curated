@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2026 Nardo. AGPL-3.0 — see LICENSE
 # fswatch wrapper — watches ~/.claude/skills/ recursively,
 # debounces (5s latency), then runs rescan on changed skills.
 # Launched by launchd, runs forever.

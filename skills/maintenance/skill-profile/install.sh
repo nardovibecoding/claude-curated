@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2026 Nardo. AGPL-3.0 — see LICENSE
 # Install skillswitch for Claude Code
 echo "Installing skillswitch..."
 

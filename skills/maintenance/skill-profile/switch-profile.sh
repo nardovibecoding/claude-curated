@@ -1,4 +1,5 @@
 #!/bin/bash
+# Copyright (c) 2026 Nardo. AGPL-3.0 — see LICENSE
 PROFILE="${1:-all}"
 SKILLS_DIR="$HOME/.claude/skills"
 BACKUP_DIR="$HOME/.claude/skills-master"

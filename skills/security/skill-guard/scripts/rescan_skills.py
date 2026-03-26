@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-# claude-curated-fresh — https://github.com/nardovibecoding/claude-curated-fresh
-# Copyright (c) 2026 nardovibecoding. Licensed under Apache-2.0.
+# Copyright (c) 2026 Nardo. AGPL-3.0 — see LICENSE
 """
 Skill Rescan — detect changed skills and re-audit them.
 
