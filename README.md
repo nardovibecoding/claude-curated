@@ -146,7 +146,18 @@ Skills and hooks are independent — install only what you need.
 
 ## Install
 
-### Skills — as a plugin (recommended)
+One command. Takes 30 seconds.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/nardovibecoding/claude-skills-curation/main/install.sh | bash
+```
+
+Clones the repo, registers all 13 hooks + 6 skills in `~/.claude/settings.json`. Restart Claude Code.
+
+<details>
+<summary>Manual install</summary>
+
+### Skills — as a plugin
 
 ```bash
 claude plugins install nardovibecoding/claude-skills-curation
@@ -157,13 +168,6 @@ claude plugins install nardovibecoding/claude-skills-curation
 ```bash
 git clone https://github.com/nardovibecoding/claude-skills-curation.git
 cp -r claude-skills-curation/skills/workflow/research-council ~/.claude/skills/
-```
-
-### Skills — manual (all)
-
-```bash
-git clone https://github.com/nardovibecoding/claude-skills-curation.git
-find claude-skills-curation/skills -mindepth 2 -maxdepth 2 -type d -exec cp -r {} ~/.claude/skills/ \;
 ```
 
 ### Hooks
@@ -184,6 +188,8 @@ cp claude-skills-curation/hooks/memory-index/auto_memory_index.py ~/.claude/hook
 Register hooks in `~/.claude/settings.json` under `hooks.PostToolUse`. Each hook's directory contains a README with the exact registration block.
 
 **Prerequisite:** [Claude Code](https://claude.com/claude-code) CLI installed.
+
+</details>
 
 ---
 
