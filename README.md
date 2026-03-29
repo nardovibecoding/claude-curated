@@ -18,6 +18,8 @@ claude plugins install nardovibecoding/claude-skills-curation
 
 ---
 
+One Claude gives you one perspective. For code review, architecture decisions, or anything that matters — one opinion isn't enough. This brings structured debate, adversarial review, and automated context management.
+
 ## Skills
 
 Skills invoke the LLM with a structured prompt. They activate automatically on matching trigger phrases — no slash commands needed.
