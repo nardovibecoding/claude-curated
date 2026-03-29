@@ -59,7 +59,12 @@ Audits all MD-based context sources in one pass. Replaces claudemd-maintenance, 
 5. Upstream updates: compare hash vs GitHub raw for official skills (docx, pdf, pptx, xlsx)
 6. SKILL.md quality: must have name, description, triggers, NOT FOR, produces
 7. Description budget: max 400 chars per YAML description
-8. Present: broken, unused, duplicates, updates available
+8. **Reference file consolidation:** For each skill with a `references/` dir:
+   - Count files. More than 3 = consolidation candidate.
+   - Check for rigid templates (copy-paste fill-in-the-blank structures) — these should be rewritten as principles/moves instead. Templates produce similar-looking outputs every time; principles let the idea dictate the form.
+   - Check for split files that belong together (e.g. voice-rules + anti-patterns = both are voice guidance → one file).
+   - Flag if total reference lines > 300 for a single skill.
+9. Present: broken, unused, duplicates, updates available, consolidation candidates
 
 ## Phase 5: Budget Report
 
