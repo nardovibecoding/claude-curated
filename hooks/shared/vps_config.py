@@ -1,4 +1,3 @@
-# Copyright (c) 2026 Nardo (nardovibecoding). AGPL-3.0 — see LICENSE
 """Shared VPS config — reads from .env single source of truth."""
 import os
 from pathlib import Path
@@ -6,10 +5,7 @@ from pathlib import Path
 
 def _load_env():
     """Load .env file without external dependencies."""
-    env_path = os.environ.get("DOTENV_PATH")
-    if not env_path:
-        return
-    env_path = Path(env_path)
+    env_path = Path.home() / "telegram-claude-bot" / ".env"
     if not env_path.exists():
         return
     for line in env_path.read_text().splitlines():
@@ -23,8 +19,8 @@ def _load_env():
 
 _load_env()
 
-VPS_HOST = os.environ.get("VPS_HOST", "")
-VPS_USER = os.environ.get("VPS_USER", "")
+VPS_HOST = os.environ.get("VPS_HOST", "<vps-ip>")
+VPS_USER = os.environ.get("VPS_USER", "bernard")
 VPS_CLIPBOARD_PORT = os.environ.get("VPS_CLIPBOARD_PORT", "8888")
 VPS_SSH = f"{VPS_USER}@{VPS_HOST}"
-VPS_REPO = os.environ.get("VPS_REPO", "")
+VPS_REPO = "~/telegram-claude-bot"

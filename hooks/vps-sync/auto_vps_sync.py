@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# Copyright (c) 2026 Nardo (nardovibecoding). AGPL-3.0 — see LICENSE
 """PostToolUse hook: auto-sync VPS after git push."""
 import re
 import sys
@@ -17,9 +16,32 @@ def check(tool_name, tool_input, input_data):
 
 def action(tool_name, tool_input, input_data):
     ok, out = ssh_cmd(f"cd {VPS_REPO} && git fetch origin && git reset --hard origin/main")
-    if ok:
-        return f"VPS auto-synced after git push. HEAD: {out[-40:] if out else 'ok'}"
-    return f"VPS sync FAILED: {out}"
+    msg = f"VPS auto-synced after git push." if ok else f"VPS sync FAILED: {out}"
+
+    import subprocess
+    from pathlib import Path
+    scripts = Path.home() / "telegram-claude-bot" / "scripts"
+
+    # Auto-sync public extracted repos (sec-ops-guard, quality-gate, etc.)
+    sync_script = scripts / "sync_public_repos.py"
+    if sync_script.exists():
+        r = subprocess.run(
+            ["python3", str(sync_script), "--sync"],
+            capture_output=True, text=True, timeout=60)
+        synced = r.stdout.count("COPIED")
+        if synced:
+            msg += f" Public repos: {synced} files synced."
+
+    # Auto-sync template (sanitized full bot copy)
+    template_script = scripts / "sync_template.py"
+    if template_script.exists():
+        r = subprocess.run(
+            ["python3", str(template_script), "--sync"],
+            capture_output=True, text=True, timeout=60)
+        if "pushed" in r.stdout:
+            msg += " Template synced."
+
+    return msg
 
 
 if __name__ == "__main__":

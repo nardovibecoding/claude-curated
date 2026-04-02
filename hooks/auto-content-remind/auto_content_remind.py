@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-# Copyright (c) 2026 Nardo (nardovibecoding). AGPL-3.0 — see LICENSE
 """Stop hook: remind to save content-worthy moments before session ends."""
 import json
 import sys
 from pathlib import Path
 
-import os as _os
-_vps_repo = _os.environ.get("VPS_REPO_PATH", "")
-CONTENT_LOG = Path(_vps_repo) / "content_drafts" / "running_log.md" if _vps_repo else Path.home() / ".claude" / "content_drafts" / "running_log.md"
+CONTENT_LOG = Path.home() / "telegram-claude-bot" / "content_drafts" / "running_log.md"
 CTX_FILE = Path("/tmp/claude_ctx_pct")
 
 

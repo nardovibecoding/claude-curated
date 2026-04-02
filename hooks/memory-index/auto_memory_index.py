@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-# Copyright (c) 2026 Nardo (nardovibecoding). AGPL-3.0 — see LICENSE
 """PostToolUse hook: check if new memory file is in MEMORY.md index."""
 import sys
 from pathlib import Path
 sys.path.insert(0, str(__import__("pathlib").Path(__file__).parent))
 from hook_base import run_hook
 
-import glob as _glob
-_mem_matches = _glob.glob(str(Path.home() / ".claude/projects/*/memory/MEMORY.md"))
-MEMORY_DIR = Path(_mem_matches[0]).parent if _mem_matches else Path.home() / ".claude/memory"
+MEMORY_DIR = Path.home() / ".claude/projects/-Users-bernard/memory"
 INDEX = MEMORY_DIR / "MEMORY.md"
 
 
