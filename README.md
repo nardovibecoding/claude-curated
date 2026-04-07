@@ -7,8 +7,8 @@ claude plugins install nardovibecoding/claude-skills-curation
 **Production-tested Claude Code skills + hooks — LLM reasoning where you need it, deterministic automation where you don't.**
 
 [![Claude Code](https://img.shields.io/badge/Claude_Code-plugin-blueviolet?style=for-the-badge)](https://claude.com/claude-code)
-[![Skills](https://img.shields.io/badge/Skills-6-blue?style=for-the-badge)](#skills)
-[![Hooks](https://img.shields.io/badge/Hooks-5-orange?style=for-the-badge)](#hooks)
+[![Skills](https://img.shields.io/badge/Skills-7-blue?style=for-the-badge)](#skills)
+[![Hooks](https://img.shields.io/badge/Hooks-10-orange?style=for-the-badge)](#hooks)
 [![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey?style=for-the-badge)](#)
 [![License](https://img.shields.io/badge/License-AGPL--3.0-red?style=for-the-badge)](LICENSE)
 
@@ -32,6 +32,7 @@ Skills invoke the LLM with a structured prompt. They activate automatically on m
 | **Workflow** | [research-council](#research-council--6-model-debate-at-0cost) | 6 free LLMs debate, cross-examine, deliver consensus — $0/decision |
 | **Discovery** | skill-extractor | Evaluates community skills before you install — catches overlap and bloat |
 | **Discovery** | tldr-eli5 | Adaptive summarization + ELI5 mode for non-technical stakeholders |
+| **Memory** | [recall](#recall--hybrid-memory-search) | Hybrid Vector + BM25 + Graph search across all memory files — `/recall <query>` |
 
 ## Hooks
 
@@ -44,6 +45,11 @@ Hooks are plain Python scripts that fire on Claude Code `PostToolUse` events —
 | **pip-install** | `requirements.txt` edit | Auto runs `pip install -r requirements.txt` on the remote server |
 | **bot-restart** | persona JSON edit | Auto `pkill`s the affected bot process — `start_all.sh` restarts it within 10s |
 | **memory-index** | new `memory/*.md` (Write) | Checks that new memory files are listed in the `MEMORY.md` index |
+| **memory-inject** | UserPromptSubmit + PreToolUse | BM25 search on every new topic — auto-injects relevant memory snippets into context |
+| **memory-conflict** | Read + Write/Edit | Git-style conflict detection + 3-way auto-merge for memory files edited across sessions |
+| **memory-access** | PostToolUse (Read) | Tracks access frequency + importance score per memory file |
+| **memory-commit** | Stop (session end) | Rsyncs changed memory files to a git repo and auto-commits |
+| **memory-inject-reset** | SessionStart | Resets inject state so fresh memory injection happens each session |
 
 ---
 
@@ -103,6 +109,50 @@ One command. One report. Recommendations held until you approve.
 
 ---
 
+## Recall — Hybrid Memory Search
+
+`/recall <query>` searches all your memory files using four signals fused together:
+
+```
+/recall how did we fix the rate limiter?
+/recall #trading
+```
+
+**How it works:**
+
+| Signal | Method | Strength |
+|--------|--------|---------|
+| **Vector** | all-MiniLM-L6-v2 (local, no API key) | Semantic similarity — finds conceptually related files |
+| **BM25** | TF-IDF with field weighting (name 3x, description 2x, body 1x) | Keyword precision — exact term matches |
+| **Recency** | Exponential decay from last-modified date | Recent files rank higher |
+| **Graph** | Optional — traverses a knowledge graph for connected nodes | Expands to related topics |
+
+All four signals are merged using **Reciprocal Rank Fusion (k=60)** — a parameter-free fusion method that outperforms weighted averaging.
+
+**Tag search:** prefix with `#` to filter by tag instead of searching:
+```
+/recall #hooks
+/recall #security
+```
+
+Tags are built by `build-index.mjs`, which scans all memory files, hooks, and skills and classifies them by content keywords.
+
+**Embedding cache:** vectors are cached in `~/.claude/.memory_embeddings_cache.json`. Only new or modified files are re-embedded. First run downloads the model (~22MB).
+
+**Install:**
+```bash
+cd ~/.claude/skills/recall
+npm install
+node build-index.mjs   # build tag index
+node search.mjs "test query"
+```
+
+**Why it's better than grep:**
+
+Standard `grep` finds files with the exact words you typed. Recall finds files about the *concept* you're thinking of — even if you don't remember the exact terminology you used when you wrote the note.
+
+---
+
 ## Where These Came From
 
 Every item was extracted from a real production failure:
@@ -120,6 +170,10 @@ Every item was extracted from a real production failure:
 | **pip-install** | Added a dependency, forgot to install on server, service crashed at 2am. Hook installs automatically. |
 | **bot-restart** | Edited a persona config, had to manually SSH and restart. Hook handles it in 10 seconds. |
 | **memory-index** | Created a memory file, forgot to index it, couldn't find it two weeks later. Hook catches it immediately. |
+| **recall** | Searched memory with grep, got zero results because the note used different words. Built semantic search. |
+| **memory-inject** | Kept forgetting context from previous sessions. Hook auto-loads the 5 most relevant files on topic shift. |
+| **memory-conflict** | Two Claude sessions edited the same memory file simultaneously and clobbered each other. Built 3-way merge. |
+| **memory-commit** | Memory edits stayed local, never backed up. Stop hook syncs to git on every session end. |
 
 ---
 
@@ -209,9 +263,15 @@ claude-skills-curation/
 │   │   └── skill-profile/       # Profile switching (all/coding/outreach/minimal)
 │   ├── workflow/
 │   │   └── research-council/    # 6-model debate at $0/decision
-│   └── discovery/
-│       ├── skill-extractor/     # Community skill evaluator
-│       └── tldr-eli5/           # Adaptive summarization + ELI5
+│   ├── discovery/
+│   │   ├── skill-extractor/     # Community skill evaluator
+│   │   └── tldr-eli5/           # Adaptive summarization + ELI5
+│   └── memory/
+│       └── recall/              # Hybrid search (Vector + BM25 + Graph + RRF)
+│           ├── SKILL.md
+│           ├── search.mjs       # Main search script
+│           ├── build-index.mjs  # Tag index builder
+│           └── package.json
 ├── hooks/
 │   ├── shared/
 │   │   ├── hook_base.py         # run_hook(), check(), action() pattern
@@ -220,7 +280,11 @@ claude-skills-curation/
 │   ├── dependency-grep/
 │   ├── pip-install/
 │   ├── bot-restart/
-│   └── memory-index/
+│   ├── memory-index/            # Warn when new memory file not in MEMORY.md
+│   ├── memory-inject/           # Auto-inject relevant memories on topic shift
+│   ├── memory-conflict/         # 3-way merge conflict guard for memory files
+│   ├── memory-access/           # Track access frequency + importance scores
+│   └── memory-commit/           # Auto-commit memory changes at session end
 ├── README.md
 └── LICENSE
 ```

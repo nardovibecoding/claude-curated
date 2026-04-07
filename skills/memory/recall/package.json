@@ -1,0 +1,15 @@
+{
+  "name": "recall",
+  "version": "1.0.0",
+  "description": "Hybrid memory search — Vector + BM25 + Recency + Graph with RRF fusion",
+  "type": "module",
+  "scripts": {
+    "search": "node search.mjs",
+    "build-index": "node build-index.mjs"
+  },
+  "keywords": ["claude-code", "memory", "search", "rag", "bm25", "vector-search"],
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@huggingface/transformers": "^4.0.1"
+  }
+}
