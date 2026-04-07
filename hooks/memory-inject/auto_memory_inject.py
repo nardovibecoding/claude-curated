@@ -76,9 +76,16 @@ def _tokenize(text):
 
 # -- Phase 1: UserPromptSubmit --
 
+def _agent_injected_path():
+    return MARKER_DIR / f"{_tty()}_agent_done.flag"
+
+
 def _handle_prompt(prompt):
     """Tokenize user message. If topic shifted or first message, write marker."""
     MARKER_DIR.mkdir(exist_ok=True)
+
+    # Reset agent-injected flag each new user message
+    _agent_injected_path().unlink(missing_ok=True)
 
     tokens = _tokenize(prompt)
     if not tokens:
@@ -124,44 +131,64 @@ def _topic_overlap(new_tokens, old_tokens):
         return 0.0
     new_set = set(new_tokens)
     old_set = set(old_tokens)
-    return len(new_set & old_set) / min(len(new_set), len(old_set))
+    intersection = new_set & old_set
+    return len(intersection) / min(len(new_set), len(old_set))
 
 
 # -- Phase 2: PreToolUse --
 
 def _handle_tool():
-    """If marker exists, search memories and inject. One-shot per marker."""
+    """If marker exists, search memories and inject. One-shot per marker.
+    Also always checks for active background agents (even without marker)."""
     marker = _marker_path()
-    if not marker.exists():
+    has_marker = marker.exists()
+    agent_flag = _agent_injected_path()
+    agent_already = agent_flag.exists()
+    query_tokens = []
+    lines = []
+
+    if has_marker:
+        try:
+            data = json.loads(marker.read_text())
+            query_tokens = data.get("tokens", [])
+        except (json.JSONDecodeError, OSError):
+            pass
+        marker.unlink(missing_ok=True)
+
+    # BM25 memory search (only if we have query tokens)
+    if query_tokens:
+        _log(HOOK_NAME, f"injecting for tokens: {query_tokens[:10]}")
+        memories = _load_memories()
+        _log(HOOK_NAME, f"loaded {len(memories)} memories")
+        results = _bm25_search(query_tokens, memories)
+        _log(HOOK_NAME, f"top 3 scores: {[(round(s,2), m['name']) for s, m in results[:3]]}")
+        top = [(s, m) for s, m in results if s >= MIN_SCORE][:MAX_INJECT]
+        _log(HOOK_NAME, f"{len(top)} results above MIN_SCORE={MIN_SCORE}")
+
+        if top:
+            lines.append("Relevant memories auto-loaded:")
+            for score, mem in top:
+                snippet = mem["body"][:MAX_SNIPPET].replace("\n", " ").strip()
+                if len(mem["body"]) > MAX_SNIPPET:
+                    snippet += "..."
+                lines.append(f"- [{mem['type']}] {mem['name']}: {snippet}")
+
+    # Check for background agents (survives /clear), but only once per turn
+    if not agent_already:
+        try:
+            from agent_tracker import get_active_agents
+            agent_ctx = get_active_agents()
+            if agent_ctx:
+                if lines:
+                    lines.append("")
+                lines.append(agent_ctx)
+                agent_flag.write_text("1")
+        except ImportError:
+            pass
+
+    if not lines:
         print("{}")
         return
-
-    try:
-        data = json.loads(marker.read_text())
-        query_tokens = data.get("tokens", [])
-    except (json.JSONDecodeError, OSError):
-        query_tokens = []
-    marker.unlink(missing_ok=True)
-
-    if not query_tokens:
-        print("{}")
-        return
-
-    _log(HOOK_NAME, f"injecting for tokens: {query_tokens[:10]}")
-    memories = _load_memories()
-    results = _bm25_search(query_tokens, memories)
-    top = [(s, m) for s, m in results if s >= MIN_SCORE][:MAX_INJECT]
-
-    if not top:
-        print("{}")
-        return
-
-    lines = ["Relevant memories auto-loaded:"]
-    for score, mem in top:
-        snippet = mem["body"][:MAX_SNIPPET].replace("\n", " ").strip()
-        if len(mem["body"]) > MAX_SNIPPET:
-            snippet += "..."
-        lines.append(f"- [{mem['type']}] {mem['name']}: {snippet}")
 
     msg = "\n".join(lines)
     _log(HOOK_NAME, f"injected context ({len(lines)} lines)")

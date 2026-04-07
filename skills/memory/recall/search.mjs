@@ -9,6 +9,7 @@
  * BM25:   TF-IDF with field weighting (name 3x, description 2x, body 1x).
  * Recency: files modified in last 7 days get a rank boost.
  * Graph:  optional traversal of a graph.json for connected nodes.
+ * Source: results tagged "mem" (memory) or "wiki" (extra dirs) in output.
  * Fusion: Reciprocal Rank Fusion (k=60) merges all ranked lists.
  *
  * Caches embeddings to avoid re-computing on every search.
@@ -349,6 +350,9 @@ async function main() {
         };
       }
       saveCache(cache);
+      if (b + BATCH_SIZE < textsToEmbed.length) {
+        process.stderr.write(`  ${Math.min(b + BATCH_SIZE, textsToEmbed.length)}/${textsToEmbed.length} done\n`);
+      }
     }
   }
 
@@ -391,11 +395,14 @@ async function main() {
   const top = fused.slice(0, 5);
 
   if (jsonMode) {
+    // JSON output for hook auto-inject
     const results = top.map(r => {
       const f = files[r.index];
       const desc = fileParsed[r.index].fm.description || "";
+      const label = EXTRA_DIRS.some(d => f.path.startsWith(d)) ? "wiki" : "mem";
       return {
         score: r.score.toFixed(4),
+        source: label,
         file: f.name,
         path: f.path,
         description: desc.slice(0, 120),
@@ -405,7 +412,7 @@ async function main() {
     console.log(JSON.stringify(results));
   } else {
     console.log(`Query: "${query}"\n`);
-    console.log(`  Found ${files.length} memory files | BM25 hits: ${bm25Ranked.length} | Graph: ${graphNeighborFiles.size} neighbors\n`);
+    console.log(`  Found ${files.length} memory files | BM25 hits: ${bm25Ranked.length} | Vector: all scored | Graph: ${graphNeighborFiles.size} neighbors\n`);
 
     for (const r of top) {
       const f = files[r.index];
@@ -413,10 +420,11 @@ async function main() {
       const bm25Score = bm25Scores[r.index];
       const bar = "█".repeat(Math.round(r.score * 600));
       const graphTag = r.graphBoosted ? " [G]" : "";
+      const label = EXTRA_DIRS.some(d => f.path.startsWith(d)) ? "wiki" : "mem";
 
       console.log(`  [RRF ${r.score.toFixed(4)}] ${bar}${graphTag}`);
       console.log(`  vec=${vecScore.toFixed(3)}  bm25=${bm25Score.toFixed(2)}`);
-      console.log(`  ${f.name}`);
+      console.log(`  [${label}] ${f.name}`);
       console.log(`  ${f.path}\n`);
     }
   }
