@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Claude Skills Curation — one-liner installer
-# curl -fsSL https://raw.githubusercontent.com/nardovibecoding/claude-skills-curation/main/install.sh | bash
+# curl -fsSL https://raw.githubusercontent.com/nardovibecoding/simply-skills-curation/main/install.sh | bash
 set -euo pipefail
 
-INSTALL_DIR="$HOME/claude-skills-curation"
+INSTALL_DIR="$HOME/simply-skills-curation"
 SETTINGS="$HOME/.claude/settings.json"
 
 RED='\033[0;31m' GREEN='\033[0;32m' YELLOW='\033[1;33m' CYAN='\033[0;36m' BOLD='\033[1m' NC='\033[0m'
@@ -26,7 +26,7 @@ else
     exit 1
   fi
   echo -e "${GREEN}→ Cloning repository...${NC}"
-  git clone https://github.com/nardovibecoding/claude-skills-curation.git "$INSTALL_DIR"
+  git clone https://github.com/nardovibecoding/simply-skills-curation.git "$INSTALL_DIR"
 fi
 
 # --- Patch settings.json ---
@@ -36,7 +36,7 @@ mkdir -p "$HOME/.claude"
 python3 << 'PYEOF'
 import json, os
 
-INSTALL_DIR = os.path.expanduser("~/claude-skills-curation")
+INSTALL_DIR = os.path.expanduser("~/simply-skills-curation")
 SETTINGS = os.path.expanduser("~/.claude/settings.json")
 
 if os.path.exists(SETTINGS):
@@ -46,7 +46,7 @@ else:
     settings = {}
 
 hooks = settings.setdefault("hooks", {})
-MARKER = "claude-skills-curation"
+MARKER = "simply-skills-curation"
 
 # Hook definitions from the plugin
 TG_HOOKS = {

@@ -1,7 +1,7 @@
 <div align="center">
 
 ```bash
-claude plugins install nardovibecoding/claude-skills-curation
+claude plugins install nardovibecoding/simply-skills-curation
 ```
 
 **Production-tested Claude Code skills + hooks — LLM reasoning where you need it, deterministic automation where you don't.**
@@ -205,7 +205,7 @@ Skills and hooks are independent — install only what you need.
 One command. Takes 30 seconds.
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/nardovibecoding/claude-skills-curation/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/nardovibecoding/simply-skills-curation/main/install.sh | bash
 ```
 
 Clones the repo, registers all 13 hooks + 6 skills in `~/.claude/settings.json`. Restart Claude Code.
@@ -216,29 +216,29 @@ Clones the repo, registers all 13 hooks + 6 skills in `~/.claude/settings.json`.
 ### Skills — as a plugin
 
 ```bash
-claude plugins install nardovibecoding/claude-skills-curation
+claude plugins install nardovibecoding/simply-skills-curation
 ```
 
 ### Skills — manual (one at a time)
 
 ```bash
-git clone https://github.com/nardovibecoding/claude-skills-curation.git
-cp -r claude-skills-curation/skills/workflow/research-council ~/.claude/skills/
+git clone https://github.com/nardovibecoding/simply-skills-curation.git
+cp -r simply-skills-curation/skills/workflow/research-council ~/.claude/skills/
 ```
 
 ### Hooks
 
 ```bash
 # Shared library (required by all hooks)
-cp claude-skills-curation/hooks/shared/hook_base.py ~/.claude/hooks/
-cp claude-skills-curation/hooks/shared/vps_config.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/shared/hook_base.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/shared/vps_config.py ~/.claude/hooks/
 
 # Copy whichever hooks you need
-cp claude-skills-curation/hooks/vps-sync/auto_vps_sync.py ~/.claude/hooks/
-cp claude-skills-curation/hooks/dependency-grep/auto_dependency_grep.py ~/.claude/hooks/
-cp claude-skills-curation/hooks/pip-install/auto_pip_install.py ~/.claude/hooks/
-cp claude-skills-curation/hooks/bot-restart/auto_bot_restart.py ~/.claude/hooks/
-cp claude-skills-curation/hooks/memory-index/auto_memory_index.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/vps-sync/auto_vps_sync.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/dependency-grep/auto_dependency_grep.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/pip-install/auto_pip_install.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/bot-restart/auto_bot_restart.py ~/.claude/hooks/
+cp simply-skills-curation/hooks/memory-index/auto_memory_index.py ~/.claude/hooks/
 ```
 
 Register hooks in `~/.claude/settings.json` under `hooks.PostToolUse`. Each hook's directory contains a README with the exact registration block.
@@ -252,7 +252,7 @@ Register hooks in `~/.claude/settings.json` under `hooks.PostToolUse`. Each hook
 ## Project Structure
 
 ```
-claude-skills-curation/
+simply-skills-curation/
 ├── .claude-plugin/
 │   └── plugin.json              # Plugin manifest
 ├── skills/
@@ -301,7 +301,7 @@ Open an issue or PR. If you've extracted a skill from a real production problem,
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=nardovibecoding/claude-skills-curation&type=Date)](https://star-history.com/#nardovibecoding/claude-skills-curation&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=nardovibecoding/simply-skills-curation&type=Date)](https://star-history.com/#nardovibecoding/simply-skills-curation&Date)
 
 ---
 

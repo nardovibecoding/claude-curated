@@ -44,7 +44,7 @@ RESTART_MAP = {
 
 
 def _load_vps():
-    env_path = Path.home() / "telegram-claude-bot" / ".env"
+    env_path = Path(os.environ.get("PROJECT_ROOT", str(Path.home() / "your-project"))) / ".env"
     user = "bernard"
     host = "<vps-ip>"
     if env_path.exists():

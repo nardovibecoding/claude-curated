@@ -1,11 +1,11 @@
 {
-  "name": "claude-skills-curation",
+  "name": "simply-skills-curation",
   "description": "10 production-tested Claude Code skills — security scanning, adversarial review, multi-model debate, dev-server sync, memory lifecycle, and more.",
   "version": "1.0.0",
   "author": {
     "name": "nardovibecoding"
   },
-  "repository": "https://github.com/nardovibecoding/claude-skills-curation",
+  "repository": "https://github.com/nardovibecoding/simply-skills-curation",
   "license": "AGPL-3.0",
   "keywords": [
     "claude-code",
