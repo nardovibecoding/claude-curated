@@ -1,0 +1,11 @@
+# Dry-run example only. Do not put real hosts in public forks.
+enabled: false
+dry_run: true
+remote:
+  host: example.invalid
+  user: example-user
+  path: /srv/example-project
+commands:
+  after_push:
+    - git fetch --all --prune
+    - git status --short

@@ -1,18 +1,8 @@
-#!/bin/bash
-# Copyright (c) 2026 Nardo. AGPL-3.0 — see LICENSE
-# Install skillswitch for Claude Code
-echo "Installing skillswitch..."
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Copy skill
-mkdir -p ~/.claude/skills/skillswitch
-cp SKILL.md ~/.claude/skills/skillswitch/
-
-# Copy profile switcher
-cp switch-profile.sh ~/.claude/
-chmod +x ~/.claude/switch-profile.sh
-
-echo "Installed. Usage:"
-echo '  Say "coding mode", "outreach mode", "minimal mode", or "all skills"'
-echo '  Or run: ~/.claude/switch-profile.sh <profile>'
-echo ""
-echo "Edit ~/.claude/switch-profile.sh to customize profiles."
+AI_TOOL_HOME="${AI_TOOL_HOME:-$HOME/.ai-tool}"
+mkdir -p "$AI_TOOL_HOME/skills/skill-profile"
+cp SKILL.md switch-profile.sh "$AI_TOOL_HOME/skills/skill-profile/"
+chmod +x "$AI_TOOL_HOME/skills/skill-profile/switch-profile.sh"
+echo "Installed skill-profile into $AI_TOOL_HOME/skills/skill-profile"

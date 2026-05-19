@@ -1,6 +1,6 @@
 {
   "name": "simply-skills-curation",
-  "description": "10 production-tested Claude Code skills — security scanning, adversarial review, multi-model debate, dev-server sync, memory lifecycle, and more.",
+  "description": "Public-safe AI coding skills and local hooks for review, research, summarization, and project hygiene.",
   "version": "1.0.0",
   "author": {
     "name": "nardovibecoding"
@@ -8,20 +8,15 @@
   "repository": "https://github.com/nardovibecoding/simply-skills-curation",
   "license": "AGPL-3.0",
   "keywords": [
-    "claude-code",
-    "claude",
-    "anthropic",
     "ai-agents",
     "agent-skills",
     "developer-tools",
     "security",
     "code-review",
-    "memory-management",
     "automation",
     "productivity",
     "ai-debate",
-    "devops",
     "llm",
-    "vibe-coding"
+    "local-first"
   ]
 }

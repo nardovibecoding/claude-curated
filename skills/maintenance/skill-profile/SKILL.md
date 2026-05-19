@@ -1,38 +1,27 @@
 ---
 name: skill-profile
-description: |
-  Switch skill profiles mid-session. Profiles: all, coding, outreach, minimal.
-  Triggers: "coding mode", "outreach mode", "minimal mode", "all skills",
-  "switch profile", "load skills for".
-  NOT FOR: switching AI models (use /model), changing settings.
-  produces: Updated skill profile with only relevant skills loaded for the current task context
+description: Switch between small local skill profiles: all, coding, writing, or minimal.
 ---
 
-# Skill Router — Profile Switching
+# Skill Profile
 
-Swap active skills mid-session without restarting.
+Use this when a user wants a smaller active skill set for a task.
+
+Profiles are examples. Edit `switch-profile.sh` to fit your local skill names.
 
 ## Profiles
 
-| Profile | Skills loaded | When |
-|---------|-------------|------|
-| `all` | Everything | Default, general work |
-| `coding` | investigate, review, ship, critic, dependency-tracker, plan-eng-review | Dev/debugging |
-| `outreach` | debate, content-humanizer, eli5, office-hours | BD/content work |
-| `minimal` | chatid, remind, system-check, home | Quick tasks |
+| profile | keeps |
+|---|---|
+| `all` | restores every backed-up skill |
+| `coding` | review, debug, build, dependency, test, summarize |
+| `writing` | summarize, explain, rewrite, review |
+| `minimal` | summarize, remind, status |
 
-## How to Switch
+## Command
 
 ```bash
-# The router script handles symlink swapping
-~/.claude/switch-profile.sh <profile>
+AI_TOOL_HOME="$HOME/.ai-tool" ./switch-profile.sh coding
 ```
 
-After switching, tell the user: "Switched to {profile} mode. {N} skills active."
-The new skills take effect on the NEXT prompt.
-
-## Auto-Detect (optional)
-If user's message contains keywords, suggest switching:
-- "debug", "fix", "error", "broken" -> suggest coding
-- "outreach", "BD", "message", "DM" -> suggest outreach
-- Don't auto-switch without asking -- just suggest
+The script only touches `AI_TOOL_HOME/skills`.
